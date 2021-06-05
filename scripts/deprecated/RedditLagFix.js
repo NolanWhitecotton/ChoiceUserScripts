@@ -5,6 +5,9 @@
 // @match    https://www.reddit.com/
 // ==/UserScript==
 
+//NOTE: This only fixes the clientside lag, most of the hangtime on reddit comes from waiting for a response therefore
+//      I don't think that it is worth maintaining.
+
 var containerClassName = "rpBJOHq2PR60pnwJlUyP0"; //the name of the container that holds all the posts
 var hideKey = "KeyP";//the keycode of the key to depete posts from the dom
 var PostKeepBuffer = 15;//the number of posts to keep at the end
