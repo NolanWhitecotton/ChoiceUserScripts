@@ -1,76 +1,95 @@
 // ==UserScript==
 // @name     Custom YT
-// @version  1
+// @version  1.1.0
 // @grant    none
-// @match 	 https://youtube.com/*/*
-// @match 	 https://youtube.com/*
-// @match	   https://www.youtube.com/feed/subscriptions
+// @match    https://youtube.com/*/*
+// @match    https://youtube.com/*
+// @match    https://www.youtube.com/feed/subscriptions
 // @match    https://www.youtube.com/watch*
-// @match    https://www.youtube.com/playlist?*
 // ==/UserScript==
 
-/*
-adds amt to the video speed
-*/
+// ===== setings =====
+//hide
+var hideKey = "KeyH";
+var hideCheckInterval = 1000; //how often it hides videos
+
+//speed
+var incSpeedKey = ""
+var decSpeedKey = ""
+var speedChangeAmmt = 0.5;
+
+// ===== constants =====
+//hide
+var progressBarClassName = "style-scope ytd-thumbnail-overlay-resume-playback-renderer";
+var fullVideoClassName = "style-scope ytd-grid-renderer";
+
+//speed
+var VideoTagName = "video";
+var playbackSpeedMenuTitle = "Playback speed";
+var DefaultPlaybackSpeedName = "Normal";
+var menuLabelClassName = "ytp-menuitem-label";
+var menuItemClassName = "ytp-menuitem-content";
+
+// ===== code =====
+//adds amt to the video speed
 function changeSpeed(amt){
-  document.getElementsByTagName("video")[0].playbackRate = document.getElementsByTagName("video")[0].playbackRate + amt;
+  document.getElementsByTagName(VideoTagName)[0].playbackRate = document.getElementsByTagName(VideoTagName)[0].playbackRate + amt;
 }
 
+//update the playback speed notifier in the video play bar
 function updateSpeed(){
-  var labels = document.getElementsByClassName("ytp-menuitem-label");
+  var labels = document.getElementsByClassName(menuLabelClassName);
   for(var i=0;i<labels.length;i++){
-    if(labels[i].innerHTML=="Playback speed"){
-      var speed = document.getElementsByTagName("video")[0].playbackRate;
-			document.getElementsByClassName("ytp-menuitem-content")[i].innerHTML = (speed==1 ? "Normal" : speed);
+    if(labels[i].innerHTML==playbackSpeedMenuTitle){
+      var speed = document.getElementsByTagName(VideoTagName)[0].playbackRate;
+      document.getElementsByClassName(menuItemClassName)[i].innerHTML = (speed==1 ? DefaultPlaybackSpeedName : speed);
     }
   }
 }
 
-document.addEventListener("keypress", function(event) {
-  //h hides watched videos on subbox
-  if (event.keyCode == 104) {
-        var bars = document.getElementsByClassName("style-scope ytd-thumbnail-overlay-resume-playback-renderer");
-      	for(var i=1;i<bars.length;i++){
-          var curBar = bars[i]
-        	while(curBar.className!="style-scope ytd-grid-renderer"){
-          	curBar = curBar.parentElement;
-          }
-          curBar.hidden=true;
-        }
+//update hidden/unhidden video state 
+var watchedAreHidden = false; //whether the videos are hidden
+var hiddenVideos = []; //list of currently hidden videos
+setInterval(updateHidden, hideCheckInterval);
+function updateHidden(){
+  if(watchedAreHidden){
+    //hide videos
+    var bars = document.getElementsByClassName(progressBarClassName);
+    for(var i=1;i<bars.length;i++){
+      var curBar = bars[i];
+      //get the parent until it is a full video
+      while(curBar.className!=fullVideoClassName){
+        curBar = curBar.parentElement;
+      }
+      //hide and add to hiddenVideoss
+      curBar.hidden=true;
+      hiddenVideos.push(curBar);
     }
-  console.log(event.keyCode)
- 
-  //inc speed 0.5 with num +
-  /*if (event.keyCode == 43) {
-    changeSpeed(0.5);
+  }else{
+    //unhide videos
+    for(var i=hiddenVideos.length-1;i>=0;i--){
+      hiddenVideos[i].hidden=false;
+    }
+  }
+}
+
+//handle keypresses
+document.addEventListener("keypress", function(event) {
+  //toggle hide
+  if (event.code == hideKey) {
+    watchedAreHidden = !watchedAreHidden;
+    updateHidden();
+  }
+  console.log(event.code)
+
+  //inc speed
+  if (event.code == incSpeedKey) {
+    changeSpeed(speedChangeAmmt);
     updateSpeed();
   }
-  //dec speed 0.5 with num -
-  if (event.keyCode == 45) {
-    changeSpeed(-0.5);
+  //dec speed
+  if (event.code == decSpeedKey) {
+    changeSpeed(speedChangeAmmt*-1);
     updateSpeed();
-  }*/
-  
-  //playlist length calculator (legacy, only works on (removed) disable_polymer=true playlists)
-  /*if(event.keyCode == 76 || event.keyCode == 108){
-  	const table = document.getElementById("pl-video-table")
-    const rows = Array.from(table.rows)
-    const toSeconds = s => s ? s.split(':').map(v => parseInt(v)).reverse().reduce((acc,e,i) => acc + e * Math.pow(60,i)) : 0
-    const getTimestamp = row => toSeconds(row.children[6].children[0].children[0].innerText)
-    let seconds = rows.reduce((acc,e) => acc + getTimestamp(e),0)
-    let mins = parseInt(seconds / 60)
-    seconds %= 60
-    let hours = parseInt(mins / 60)
-    mins %= 60
-    alert(hours+":"+mins+":"+seconds)
-    console.log(hours+":"+mins+":"+seconds)
   }
- 	//old playlist extender
-  if(event.keyCode == 76 || event.keyCode == 107){
-  	document.getElementsByClassName("yt-uix-button yt-uix-button-size-default yt-uix-button-default load-more-button yt-uix-load-more browse-items-load-more-button")[0].click();
-  }*/
 })
-
-
-
-
