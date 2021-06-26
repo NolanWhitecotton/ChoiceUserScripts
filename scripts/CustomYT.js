@@ -55,7 +55,7 @@ function updateHidden(){
 	if(watchedAreHidden){
 		//hide videos
 		var bars = document.getElementsByClassName(progressBarClassName);
-		for(var i=1;i<bars.length;i++){
+		for(var i=0;i<bars.length;i++){
 			var curBar = bars[i];
 			//get the parent until it is a full video
 			while(curBar.className!=fullVideoClassName){
