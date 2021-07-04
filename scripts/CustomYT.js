@@ -12,6 +12,7 @@
 //hide
 var hideKey = "KeyH";
 var hideCheckInterval = 1000; //how often it hides videos
+var maxHideParentCheck = 5; //how far to look up for the video from the progress bar. This is a failsafe incase YT changes the classnames
 
 //speed
 var incSpeedKey = ""
@@ -47,7 +48,7 @@ function updateSpeed(){
 	}
 }
 
-//update hidden/unhidden video state 
+//update hidden/unhidden video state
 var watchedAreHidden = false; //whether the videos are hidden
 var hiddenVideos = []; //list of currently hidden videos
 setInterval(updateHidden, hideCheckInterval);
@@ -55,15 +56,20 @@ function updateHidden(){
 	if(watchedAreHidden){
 		//hide videos
 		var bars = document.getElementsByClassName(progressBarClassName);
-		for(var i=0;i<bars.length;i++){
+		for(var i=0;i<bars.length;i++){//for every bar
 			var curBar = bars[i];
+			var curDepth = 0;
 			//get the parent until it is a full video
-			while(curBar.className!=fullVideoClassName){
+			while(curDepth <= maxHideParentCheck){
+				curDepth++;
 				curBar = curBar.parentElement;
+				if(curBar.className==fullVideoClassName){
+					//hide and add to hiddenVideoss
+					curBar.hidden=true;
+					hiddenVideos.push(curBar);
+					break;
+				}
 			}
-			//hide and add to hiddenVideoss
-			curBar.hidden=true;
-			hiddenVideos.push(curBar);
 		}
 	}else{
 		//unhide videos
