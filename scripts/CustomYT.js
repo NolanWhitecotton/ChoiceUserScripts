@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     Custom YT
-// @version  1.1.0
+// @version  1.1.1
 // @grant    none
 // @match    https://youtube.com/*/*
 // @match    https://youtube.com/*
