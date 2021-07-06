@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     Custom YT
-// @version  1.1.1
+// @version  1.2.0
 // @grant    none
 // @match    https://youtube.com/*/*
 // @match    https://youtube.com/*
@@ -12,7 +12,7 @@
 //hide
 var hideKey = "KeyH";
 var hideCheckInterval = 1000; //how often it hides videos
-var maxHideParentCheck = 5; //how far to look up for the video from the progress bar. This is a failsafe incase YT changes the classnames
+var maxHideParentCheck = 10; //how far to look up for the video from the progress bar. This is a failsafe incase YT changes the classnames
 
 //speed
 var incSpeedKey = ""
@@ -21,8 +21,9 @@ var speedChangeAmmt = 0.5;
 
 // ===== constants =====
 //hide
-var progressBarClassName = "style-scope ytd-thumbnail-overlay-resume-playback-renderer";
-var fullVideoClassName = "style-scope ytd-grid-renderer";
+var progressBarClassName = "style-scope ytd-thumbnail-overlay-resume-playback-renderer"; //The class of the progress bar, both in the subbox and recomendation sidebar
+var fullVideoClassName = "style-scope ytd-grid-renderer"; //The class of the entire video in the subbox
+var fullRecomendedVideoClassName = "style-scope ytd-item-section-renderer" //The class of the entire video in the recomended sidebar
 
 //speed
 var VideoTagName = "video";
@@ -48,6 +49,15 @@ function updateSpeed(){
 	}
 }
 
+function isOneOf(input, ...list){
+	for(var i=0;i<list.length;i++){
+		if(input==list[i]){
+			return true;
+		}
+	}
+	return false;
+}
+
 //update hidden/unhidden video state
 var watchedAreHidden = false; //whether the videos are hidden
 var hiddenVideos = []; //list of currently hidden videos
@@ -63,7 +73,7 @@ function updateHidden(){
 			while(curDepth <= maxHideParentCheck){
 				curDepth++;
 				curBar = curBar.parentElement;
-				if(curBar.className==fullVideoClassName){
+				if(isOneOf(curBar.className,fullVideoClassName,fullRecomendedVideoClassName)){
 					//hide and add to hiddenVideoss
 					curBar.hidden=true;
 					hiddenVideos.push(curBar);
