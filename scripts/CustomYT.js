@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     Custom YT
-// @version  1.2.0
+// @version  1.2.1
 // @grant    none
 // @match    https://youtube.com/*/*
 // @match    https://youtube.com/*
@@ -49,6 +49,7 @@ function updateSpeed(){
 	}
 }
 
+//checks if input is in list[]
 function isOneOf(input, ...list){
 	for(var i=0;i<list.length;i++){
 		if(input==list[i]){
@@ -61,10 +62,17 @@ function isOneOf(input, ...list){
 //update hidden/unhidden video state
 var watchedAreHidden = false; //whether the videos are hidden
 var hiddenVideos = []; //list of currently hidden videos
+var lastCheckURL = ""; //the url of the page last time update hidden was called
 setInterval(updateHidden, hideCheckInterval);
 function updateHidden(){
+	//if the url changes, unhide videos
+	if(lastCheckURL != document.URL){
+		watchedAreHidden = false;
+	}
+	lastCheckURL = document.URL;
+	
 	if(watchedAreHidden){
-		//hide videos
+		//hide any unhidden videos
 		var bars = document.getElementsByClassName(progressBarClassName);
 		for(var i=0;i<bars.length;i++){//for every bar
 			var curBar = bars[i];
@@ -82,7 +90,7 @@ function updateHidden(){
 			}
 		}
 	}else{
-		//unhide videos
+		//unhide hidden videos
 		for(var i=hiddenVideos.length-1;i>=0;i--){
 			hiddenVideos[i].hidden=false;
 		}
