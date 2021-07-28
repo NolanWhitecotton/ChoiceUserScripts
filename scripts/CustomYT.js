@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     Custom YT
-// @version  1.2.1
+// @version  1.2.2
 // @grant    none
 // @match    https://youtube.com/*/*
 // @match    https://youtube.com/*
@@ -10,27 +10,27 @@
 
 // ===== setings =====
 //hide
-var hideKey = "KeyH";
-var hideCheckInterval = 1000; //how often it hides videos
-var maxHideParentCheck = 10; //how far to look up for the video from the progress bar. This is a failsafe incase YT changes the classnames
+let hideKey = "KeyH";
+let hideCheckInterval = 1000; //how often it hides videos
+let maxHideParentCheck = 10; //how far to look up for the video from the progress bar. This is a failsafe incase YT changes the classnames
 
 //speed
-var incSpeedKey = ""
-var decSpeedKey = ""
-var speedChangeAmmt = 0.5;
+let incSpeedKey = ""
+let decSpeedKey = ""
+let speedChangeAmmt = 0.5;
 
 // ===== constants =====
 //hide
-var progressBarClassName = "style-scope ytd-thumbnail-overlay-resume-playback-renderer"; //The class of the progress bar, both in the subbox and recomendation sidebar
-var fullVideoClassName = "style-scope ytd-grid-renderer"; //The class of the entire video in the subbox
-var fullRecomendedVideoClassName = "style-scope ytd-item-section-renderer" //The class of the entire video in the recomended sidebar
+let progressBarClassName = "style-scope ytd-thumbnail-overlay-resume-playback-renderer"; //The class of the progress bar, both in the subbox and recomendation sidebar
+let fullVideoClassName = "style-scope ytd-grid-renderer"; //The class of the entire video in the subbox
+let fullRecomendedVideoClassName = "style-scope ytd-item-section-renderer" //The class of the entire video in the recomended sidebar
 
 //speed
-var VideoTagName = "video";
-var playbackSpeedMenuTitle = "Playback speed";
-var DefaultPlaybackSpeedName = "Normal";
-var menuLabelClassName = "ytp-menuitem-label";
-var menuItemClassName = "ytp-menuitem-content";
+let VideoTagName = "video";
+let playbackSpeedMenuTitle = "Playback speed";
+let DefaultPlaybackSpeedName = "Normal";
+let menuLabelClassName = "ytp-menuitem-label";
+let menuItemClassName = "ytp-menuitem-content";
 
 // ===== code =====
 //adds amt to the video speed
@@ -40,10 +40,10 @@ function changeSpeed(amt){
 
 //update the playback speed notifier in the video play bar
 function updateSpeed(){
-	var labels = document.getElementsByClassName(menuLabelClassName);
-	for(var i=0;i<labels.length;i++){
+	let labels = document.getElementsByClassName(menuLabelClassName);
+	for(let i=0;i<labels.length;i++){
 		if(labels[i].innerHTML==playbackSpeedMenuTitle){
-			var speed = document.getElementsByTagName(VideoTagName)[0].playbackRate;
+			let speed = document.getElementsByTagName(VideoTagName)[0].playbackRate;
 			document.getElementsByClassName(menuItemClassName)[i].innerHTML = (speed==1 ? DefaultPlaybackSpeedName : speed);
 		}
 	}
@@ -51,7 +51,7 @@ function updateSpeed(){
 
 //checks if input is in list[]
 function isOneOf(input, ...list){
-	for(var i=0;i<list.length;i++){
+	for(let i=0;i<list.length;i++){
 		if(input==list[i]){
 			return true;
 		}
@@ -60,9 +60,9 @@ function isOneOf(input, ...list){
 }
 
 //update hidden/unhidden video state
-var watchedAreHidden = false; //whether the videos are hidden
-var hiddenVideos = []; //list of currently hidden videos
-var lastCheckURL = ""; //the url of the page last time update hidden was called
+let watchedAreHidden = false; //whether the videos are hidden
+let hiddenVideos = []; //list of currently hidden videos
+let lastCheckURL = ""; //the url of the page last time update hidden was called
 setInterval(updateHidden, hideCheckInterval);
 function updateHidden(){
 	//if the url changes, unhide videos
@@ -70,13 +70,13 @@ function updateHidden(){
 		watchedAreHidden = false;
 	}
 	lastCheckURL = document.URL;
-	
+
 	if(watchedAreHidden){
 		//hide any unhidden videos
-		var bars = document.getElementsByClassName(progressBarClassName);
-		for(var i=0;i<bars.length;i++){//for every bar
-			var curBar = bars[i];
-			var curDepth = 0;
+		let bars = document.getElementsByClassName(progressBarClassName);
+		for(let i=0;i<bars.length;i++){//for every bar
+			let curBar = bars[i];
+			let curDepth = 0;
 			//get the parent until it is a full video
 			while(curDepth <= maxHideParentCheck){
 				curDepth++;
@@ -91,7 +91,7 @@ function updateHidden(){
 		}
 	}else{
 		//unhide hidden videos
-		for(var i=hiddenVideos.length-1;i>=0;i--){
+		for(let i=hiddenVideos.length-1;i>=0;i--){
 			hiddenVideos[i].hidden=false;
 		}
 	}
